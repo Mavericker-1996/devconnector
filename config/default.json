@@ -1,3 +1,4 @@
 {
-  "mongoURI": "mongodb+srv://devconnector:C++zzqjmgs1996@cluster0-kwcp1.mongodb.net/test?retryWrites=true"
+  "mongoURI": "mongodb+srv://devconnector:C++zzqjmgs1996@cluster0-kwcp1.mongodb.net/test?retryWrites=true",
+  "jwtSecret": "mysecrettoken"
 }

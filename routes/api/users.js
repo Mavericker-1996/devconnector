@@ -3,6 +3,8 @@ const router = express.Router();
 const { check, validationResult } = require("express-validator/check");
 const gravatar = require("gravatar");
 const bcrypt = require("bcryptjs");
+const jwt = require("jsonwebtoken");
+const config = require("config");
 const User = require("../../models/User");
 
 /**
@@ -27,7 +29,7 @@ router.post(
   async (req, res) => {
     const errors = validationResult(req);
 
-    // 如果存在检验错误
+    // if errors exist
     if (!errors.isEmpty()) {
       return res.status(400).json({ errors: errors.array() });
     }
@@ -35,10 +37,12 @@ router.post(
     const { name, email, password } = req.body;
 
     try {
-      // 检验用户是否存在
+      // check if the user exists
       let user = await User.findOne({ email });
       if (user) {
-        res.status(400).json({ errors: [{ msg: "User already exists" }] });
+        return res
+          .status(400)
+          .json({ errors: [{ msg: "User already exists" }] });
       }
 
       // Get users gravatar
@@ -48,6 +52,7 @@ router.post(
         d: "mm"
       });
 
+      // create new user
       user = new User({
         name,
         email,
@@ -55,20 +60,35 @@ router.post(
         avatar
       });
 
-      // Encrypt password
+      // Encrypt password by bcrypt
       const salt = await bcrypt.genSalt(10);
       user.password = await bcrypt.hash(password, salt);
 
+      // save the user to the mongodb
       await user.save();
 
-      // Retrun jsonwebtoken
-      res.send("User registered");
+      // Return jsonwebtoken
+      const payload = {
+        user: {
+          id: user.id
+        }
+      };
+
+      jwt.sign(
+        payload,
+        config.get("jwtSecret"),
+        {
+          expiresIn: 3600
+        },
+        (err, token) => {
+          if (err) throw err;
+          res.json({ token });
+        }
+      );
     } catch (err) {
       console.log(err.message);
       re.status.send("Server error");
     }
-
-    res.send("User route");
   }
 );
 
