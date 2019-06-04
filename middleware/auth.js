@@ -13,6 +13,8 @@ module.exports = function(req, res, next) {
   // Verify token
   try {
     const decoded = jwt.verify(token, config.get("jwtSecret"));
+
+    // add user property to the request, then we can use it to get the user's id
     req.user = decoded.user;
     next();
   } catch (err) {

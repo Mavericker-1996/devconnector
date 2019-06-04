@@ -18,4 +18,6 @@ const connectDB = async () => {
   }
 };
 
+mongoose.set("useFindAndModify", false);
+
 module.exports = connectDB;
