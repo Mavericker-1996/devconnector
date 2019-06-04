@@ -29,7 +29,7 @@ router.post(
   async (req, res) => {
     const errors = validationResult(req);
 
-    // if errors exist
+    // If errors exist
     if (!errors.isEmpty()) {
       return res.status(400).json({ errors: errors.array() });
     }
@@ -37,7 +37,7 @@ router.post(
     const { name, email, password } = req.body;
 
     try {
-      // check if the user exists
+      // Check if the user exists
       let user = await User.findOne({ email });
       if (user) {
         return res
@@ -52,7 +52,7 @@ router.post(
         d: "mm"
       });
 
-      // create new user
+      // Create new user
       user = new User({
         name,
         email,
@@ -64,7 +64,7 @@ router.post(
       const salt = await bcrypt.genSalt(10);
       user.password = await bcrypt.hash(password, salt);
 
-      // save the user to the mongodb
+      // Save the user to the mongodb
       await user.save();
 
       // Return jsonwebtoken
@@ -78,7 +78,7 @@ router.post(
         payload,
         config.get("jwtSecret"),
         {
-          expiresIn: 3600
+          expiresIn: 360000
         },
         (err, token) => {
           if (err) throw err;
